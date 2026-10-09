@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard,
@@ -15,6 +16,7 @@ import { DashboardPage, NetworkOption, NotificationItem } from '../../types/dash
 import { EthereumIcon, BaseIcon, SolanaIcon, ArbitrumIcon, PolygonIcon, OptimismIcon } from '../icons/NetworkIcons';
 import { useAppSettings } from '../../context/AppSettingsContext';
 import { useToast } from '../../context/ToastContext';
+import { usePullToRefresh } from '../../context/PullToRefreshContext';
 
 interface DashboardLayoutProps {
   currentPage: DashboardPage;
@@ -33,6 +35,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const { t, language } = useAppSettings();
   const { showToast } = useToast();
+  const { cancelRefresh } = usePullToRefresh();
   const [copied, setCopied] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState('base');
   const [networkDropdownOpen, setNetworkDropdownOpen] = useState(false);
@@ -304,116 +307,134 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         {children}
       </main>
 
-      {/* 3. CAPSULE BOTTOM NAVBAR: Extended width to fit user phone nicely, glasses animation, no labels, solid center button */}
-      <nav 
-        aria-label="Bottom Navigation"
-        className="fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto w-[calc(100%-1.25rem)] max-w-xl sm:max-w-2xl px-1"
-      >
-        <div className="w-full flex items-center justify-around sm:justify-between px-2 sm:px-8 py-2.5 rounded-full bg-[#141419]/95 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/90">
-          
-          {/* Item 1: Dashboard */}
-          <button
-            onClick={() => onPageChange('dashboard')}
-            aria-label={t.navDashboard}
-            title={t.navDashboard}
-            className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
-          >
-            {currentPage === 'dashboard' && (
-              <motion.div
-                layoutId="glassesLens"
-                className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
-                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-              />
-            )}
-            <LayoutDashboard
-              className={`w-5 h-5 relative z-10 transition-colors ${
-                currentPage === 'dashboard' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
-              }`}
-            />
-          </button>
-
-          {/* Item 2: Portfolio */}
-          <button
-            onClick={() => onPageChange('portfolio')}
-            aria-label={t.navPortfolio}
-            title={t.navPortfolio}
-            className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
-          >
-            {currentPage === 'portfolio' && (
-              <motion.div
-                layoutId="glassesLens"
-                className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
-                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-              />
-            )}
-            <PieChart
-              className={`w-5 h-5 relative z-10 transition-colors ${
-                currentPage === 'portfolio' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
-              }`}
-            />
-          </button>
-
-          {/* Item 3: CENTER ITEM (ELEVATED DISTINCT FLOATING SWAP BUTTON) */}
-          <div className="relative -translate-y-3.5 sm:-translate-y-4 px-1 sm:px-2 shrink-0">
-            <button
-              onClick={() => onQuickAction('swap')}
-              aria-label={t.navSwap}
-              title={t.navSwap}
-              className="relative w-13 h-13 sm:w-14 sm:h-14 rounded-2xl sm:rounded-full bg-[#0095FF] hover:bg-[#0080E0] text-white shadow-lg shadow-black/50 border border-white/20 flex flex-col items-center justify-center p-1 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+      {/* 3. CAPSULE BOTTOM NAVBAR: Portaled to document.body so it stays strictly fixed to the viewport during pull-to-refresh without shifting */}
+      {typeof document !== 'undefined'
+        ? createPortal(
+            <nav
+              aria-label="Bottom Navigation"
+              className="fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto w-[calc(100%-1.25rem)] max-w-xl sm:max-w-2xl px-1"
             >
-              <div className="w-full h-full flex flex-col items-center justify-center">
-                <Repeat className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white group-hover:rotate-180 transition-transform duration-300" />
-                <span className="text-[8px] font-bold uppercase tracking-wider text-white/90 mt-0.5 font-mono">
-                  {t.navSwap}
-                </span>
+              <div className="w-full flex items-center justify-around sm:justify-between px-2 sm:px-8 py-2.5 rounded-full bg-[#141419]/95 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/90">
+                {/* Item 1: Dashboard */}
+                <button
+                  onClick={() => {
+                    cancelRefresh();
+                    onPageChange('dashboard');
+                  }}
+                  aria-label={t.navDashboard}
+                  title={t.navDashboard}
+                  className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
+                >
+                  {currentPage === 'dashboard' && (
+                    <motion.div
+                      layoutId="glassesLens"
+                      className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <LayoutDashboard
+                    className={`w-5 h-5 relative z-10 transition-colors ${
+                      currentPage === 'dashboard' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
+                    }`}
+                  />
+                </button>
+
+                {/* Item 2: Portfolio */}
+                <button
+                  onClick={() => {
+                    cancelRefresh();
+                    onPageChange('portfolio');
+                  }}
+                  aria-label={t.navPortfolio}
+                  title={t.navPortfolio}
+                  className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
+                >
+                  {currentPage === 'portfolio' && (
+                    <motion.div
+                      layoutId="glassesLens"
+                      className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <PieChart
+                    className={`w-5 h-5 relative z-10 transition-colors ${
+                      currentPage === 'portfolio' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
+                    }`}
+                  />
+                </button>
+
+                {/* Item 3: CENTER ITEM (ELEVATED DISTINCT FLOATING SWAP BUTTON) */}
+                <div className="relative -translate-y-3.5 sm:-translate-y-4 px-1 sm:px-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      cancelRefresh();
+                      onQuickAction('swap');
+                    }}
+                    aria-label={t.navSwap}
+                    title={t.navSwap}
+                    className="relative w-13 h-13 sm:w-14 sm:h-14 rounded-2xl sm:rounded-full bg-[#0095FF] hover:bg-[#0080E0] text-white shadow-lg shadow-black/50 border border-white/20 flex flex-col items-center justify-center p-1 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+                  >
+                    <div className="w-full h-full flex flex-col items-center justify-center">
+                      <Repeat className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white group-hover:rotate-180 transition-transform duration-300" />
+                      <span className="text-[8px] font-bold uppercase tracking-wider text-white/90 mt-0.5 font-mono">
+                        {t.navSwap}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Item 4: Activity */}
+                <button
+                  onClick={() => {
+                    cancelRefresh();
+                    onPageChange('activity');
+                  }}
+                  aria-label={t.navActivity}
+                  title={t.navActivity}
+                  className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
+                >
+                  {currentPage === 'activity' && (
+                    <motion.div
+                      layoutId="glassesLens"
+                      className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <History
+                    className={`w-5 h-5 relative z-10 transition-colors ${
+                      currentPage === 'activity' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
+                    }`}
+                  />
+                </button>
+
+                {/* Item 5: Settings (Privy Embedded Wallet & Preferences) */}
+                <button
+                  onClick={() => {
+                    cancelRefresh();
+                    onPageChange('settings');
+                  }}
+                  aria-label={t.navSettings}
+                  title={t.navSettings}
+                  className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
+                >
+                  {(currentPage === 'settings' || currentPage === 'wallet') && (
+                    <motion.div
+                      layoutId="glassesLens"
+                      className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <Settings
+                    className={`w-5 h-5 relative z-10 transition-colors ${
+                      currentPage === 'settings' || currentPage === 'wallet' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
+                    }`}
+                  />
+                </button>
               </div>
-            </button>
-          </div>
-
-          {/* Item 4: Activity */}
-          <button
-            onClick={() => onPageChange('activity')}
-            aria-label={t.navActivity}
-            title={t.navActivity}
-            className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
-          >
-            {currentPage === 'activity' && (
-              <motion.div
-                layoutId="glassesLens"
-                className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
-                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-              />
-            )}
-            <History
-              className={`w-5 h-5 relative z-10 transition-colors ${
-                currentPage === 'activity' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
-              }`}
-            />
-          </button>
-
-          {/* Item 5: Settings (Privy Embedded Wallet & Preferences) */}
-          <button
-            onClick={() => onPageChange('settings')}
-            aria-label={t.navSettings}
-            title={t.navSettings}
-            className="relative flex-1 max-w-[56px] h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer group"
-          >
-            {(currentPage === 'settings' || currentPage === 'wallet') && (
-              <motion.div
-                layoutId="glassesLens"
-                className="absolute inset-0 rounded-full bg-white/[0.12] backdrop-blur-md border border-white/20 shadow-inner"
-                transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-              />
-            )}
-            <Settings
-              className={`w-5 h-5 relative z-10 transition-colors ${
-                currentPage === 'settings' || currentPage === 'wallet' ? 'text-[#0095FF]' : 'text-neutral-400 group-hover:text-white'
-              }`}
-            />
-          </button>
-
-        </div>
-      </nav>
+            </nav>,
+            document.body
+          )
+        : null}
 
     </div>
   );
