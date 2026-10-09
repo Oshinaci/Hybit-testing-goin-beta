@@ -5,16 +5,21 @@ import { PullToRefreshContext } from '../context/PullToRefreshContext';
 interface PullToRefreshProps {
   children: React.ReactNode;
   onRefresh?: () => Promise<void> | void;
+  disabled?: boolean;
 }
 
 export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   children,
   onRefresh,
+  disabled = false,
 }) => {
   const { showToast } = useToast();
   const [pullDistance, setPullDistance] = useState<number>(0);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isPulling, setIsPulling] = useState<boolean>(false);
+
+  const disabledRef = useRef<boolean>(disabled);
+  disabledRef.current = disabled;
 
   const startYRef = useRef<number>(0);
   const lastYRef = useRef<number>(0);
@@ -55,7 +60,15 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     setPullDistance(0);
   }, []);
 
+  // If disabled changes to true, instantly cancel any active gesture/refresh
+  useEffect(() => {
+    if (disabled) {
+      cancelRefresh();
+    }
+  }, [disabled, cancelRefresh]);
+
   const handleRefresh = useCallback(async () => {
+    if (disabledRef.current) return;
     const currentId = ++refreshIdRef.current;
     setIsRefreshing(true);
     isRefreshingRef.current = true;
@@ -75,14 +88,14 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       }
 
       // If cancelled during the async operation, do not show toast!
-      if (refreshIdRef.current !== currentId || !isRefreshingRef.current) {
+      if (refreshIdRef.current !== currentId || !isRefreshingRef.current || disabledRef.current) {
         return;
       }
 
       showToast('Data Diperbarui', 'Saldo dan riwayat transaksi telah disinkronkan.', 'info');
     } catch {
       // If cancelled, do not show error toast either
-      if (refreshIdRef.current === currentId && isRefreshingRef.current) {
+      if (refreshIdRef.current === currentId && isRefreshingRef.current && !disabledRef.current) {
         showToast('Gagal Memperbarui', 'Silakan coba beberapa saat lagi.', 'error');
       }
     } finally {
@@ -100,6 +113,8 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     // Touch Events for Mobile Web
     // -------------------------------------------------------------
     const handleTouchStart = (e: TouchEvent) => {
+      if (disabledRef.current) return;
+
       // 1. If pull to refresh is already in progress, any touch cancels it immediately without toast
       if (isRefreshingRef.current) {
         cancelRefresh();
@@ -118,6 +133,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      if (disabledRef.current) return;
       if (e.touches.length === 0) return;
       const currentY = e.touches[0].clientY;
 
@@ -166,6 +182,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     };
 
     const handleTouchEnd = () => {
+      if (disabledRef.current) return;
       // If was refreshing, cancel was already handled or keep refreshing
       if (isRefreshingRef.current) return;
 
@@ -195,6 +212,8 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     let isMouseDown = false;
 
     const handleMouseDown = (e: MouseEvent) => {
+      if (disabledRef.current) return;
+
       // Any click while refresh is in progress cancels it immediately
       if (isRefreshingRef.current) {
         cancelRefresh();
@@ -210,6 +229,8 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (disabledRef.current) return;
+
       if (isRefreshingRef.current) {
         cancelRefresh();
         return;
@@ -240,6 +261,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
     };
 
     const handleMouseUp = () => {
+      if (disabledRef.current) return;
       if (isRefreshingRef.current) return;
       if (!isMouseDown) return;
 
@@ -257,6 +279,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
 
     // Wheel event: scrolling upward or downward during refresh cancels it
     const handleWheel = () => {
+      if (disabledRef.current) return;
       if (isRefreshingRef.current) {
         cancelRefresh();
       }
@@ -264,6 +287,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
 
     // Global click/pointer handler to cancel on any interaction while refreshing
     const handlePointerDown = () => {
+      if (disabledRef.current) return;
       if (isRefreshingRef.current) {
         cancelRefresh();
       }

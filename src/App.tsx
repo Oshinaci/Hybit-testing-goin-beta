@@ -64,48 +64,50 @@ export default function App() {
   // Render Dashboard View
   if (currentView === 'dashboard') {
     return (
-      <PullToRefresh>
-        <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] font-sans antialiased overflow-x-hidden selection:bg-[#0095FF]/30 selection:text-white">
-          <DashboardLayout
-            currentPage={dashboardPage}
-            onPageChange={(page) => {
-              setDashboardPage(page);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onBackToLanding={handleBackToLanding}
-            onQuickAction={(action) => setActiveQuickAction(action)}
-          >
-            {dashboardPage === 'dashboard' && (
-              <DashboardHome
-                onQuickAction={(action) => setActiveQuickAction(action)}
-                onNavigateToPortfolio={() => setDashboardPage('portfolio')}
-                onNavigateToActivity={() => setDashboardPage('activity')}
-              />
-            )}
+      <>
+        {/* Pure Loading Screen: rendered completely outside PullToRefresh, perfectly isolating loading screen */}
+        {isLaunching && (
+          <LoadingScreen duration={3200} onComplete={handleLaunchComplete} />
+        )}
 
-            {dashboardPage === 'portfolio' && (
-              <PortfolioView
-                onQuickAction={(action) => setActiveQuickAction(action)}
-              />
-            )}
+        <PullToRefresh disabled={isLaunching}>
+          <div className="min-h-screen bg-[#09090B] text-[#FAFAFA] font-sans antialiased overflow-x-hidden selection:bg-[#0095FF]/30 selection:text-white">
+            <DashboardLayout
+              currentPage={dashboardPage}
+              onPageChange={(page) => {
+                setDashboardPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onBackToLanding={handleBackToLanding}
+              onQuickAction={(action) => setActiveQuickAction(action)}
+            >
+              {dashboardPage === 'dashboard' && (
+                <DashboardHome
+                  onQuickAction={(action) => setActiveQuickAction(action)}
+                  onNavigateToPortfolio={() => setDashboardPage('portfolio')}
+                  onNavigateToActivity={() => setDashboardPage('activity')}
+                />
+              )}
 
-            {dashboardPage === 'activity' && <ActivityView />}
+              {dashboardPage === 'portfolio' && (
+                <PortfolioView
+                  onQuickAction={(action) => setActiveQuickAction(action)}
+                />
+              )}
 
-            {(dashboardPage === 'wallet' || dashboardPage === 'settings') && <SettingsView />}
-          </DashboardLayout>
+              {dashboardPage === 'activity' && <ActivityView />}
 
-          {/* Interactive Quick Action Modals */}
-          <QuickActionModals
-            type={activeQuickAction}
-            onClose={() => setActiveQuickAction(null)}
-          />
+              {(dashboardPage === 'wallet' || dashboardPage === 'settings') && <SettingsView />}
+            </DashboardLayout>
 
-          {/* Hybit Water Flow Loading Screen (shown on launch) */}
-          {isLaunching && (
-            <LoadingScreen duration={3200} onComplete={handleLaunchComplete} />
-          )}
-        </div>
-      </PullToRefresh>
+            {/* Interactive Quick Action Modals */}
+            <QuickActionModals
+              type={activeQuickAction}
+              onClose={() => setActiveQuickAction(null)}
+            />
+          </div>
+        </PullToRefresh>
+      </>
     );
   }
 

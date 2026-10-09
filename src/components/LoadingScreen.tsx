@@ -282,11 +282,24 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#09090B] select-none transition-opacity duration-150 ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#09090B] select-none touch-none overscroll-none pointer-events-auto transition-opacity duration-150 ${
         isFadingOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       role="status"
       aria-label="Loading Hybit"
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+      }}
+      onTouchEnd={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseMove={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      onWheel={(e) => {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+      }}
     >
       {/* Pristine canvas - STRICTLY NO text, NO gradients, NO AI slop halos */}
       <div className="relative flex items-center justify-center w-44 h-44 sm:w-48 sm:h-48 md:w-56 md:h-56 max-w-[70vw] max-h-[70vw]">
