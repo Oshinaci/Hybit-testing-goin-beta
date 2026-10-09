@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import {
   Wallet,
@@ -7,15 +7,12 @@ import {
   LineChart,
   ShieldCheck,
   Zap,
-  ArrowRight,
   CheckCircle2,
-  Cpu,
 } from 'lucide-react';
 
 export const Features: React.FC<{ onExploreFeature?: (id: string) => void }> = ({
   onExploreFeature,
 }) => {
-  const [activeFeature, setActiveFeature] = useState<string | null>(null);
 
   const features = [
     {
@@ -122,18 +119,16 @@ export const Features: React.FC<{ onExploreFeature?: (id: string) => void }> = (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, idx) => {
             const Icon = feature.icon;
-            const isHovered = activeFeature === feature.id;
 
             return (
               <motion.div
                 key={feature.id}
-                onMouseEnter={() => setActiveFeature(feature.id)}
-                onMouseLeave={() => setActiveFeature(null)}
+                onClick={() => onExploreFeature && onExploreFeature(feature.id)}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="group relative rounded-3xl bg-[#141418] hover:bg-[#18181D] border border-white/[0.08] hover:border-white/[0.18] p-7 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/40"
+                className="group relative rounded-3xl bg-[#141418] hover:bg-[#18181D] border border-white/[0.08] hover:border-white/[0.18] p-7 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/40 cursor-pointer"
               >
                 <div>
                   {/* Icon & Index */}

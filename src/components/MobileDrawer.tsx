@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ArrowRight, Download } from 'lucide-react';
+import { X, ArrowRight, Download, Wallet } from 'lucide-react';
 import { HybitLogo } from './icons/NetworkIcons';
 import { useToast } from '../context/ToastContext';
+import { useWallet } from '../context/WalletContext';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   onDownload,
 }) => {
   const { showComingSoon } = useToast();
+  const { isWalletConnected, openConnectModal, disconnectWallet } = useWallet();
 
   const handleDownloadClick = () => {
     onClose();
@@ -124,6 +126,35 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
             {/* Bottom Actions */}
             <div className="pt-6 border-t border-white/[0.08] flex flex-col gap-3">
+              {!isWalletConnected ? (
+                <button
+                  onClick={() => {
+                    onClose();
+                    openConnectModal();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-white font-medium text-sm transition-all cursor-pointer"
+                >
+                  <Wallet className="w-4 h-4 text-[#0095FF]" />
+                  <span>Connect Wallet</span>
+                </button>
+              ) : (
+                <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="font-mono text-neutral-300">0x7F2...8b1e</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      disconnectWallet();
+                      onClose();
+                    }}
+                    className="text-neutral-400 hover:text-red-400 text-[11px] font-mono cursor-pointer"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              )}
+
               <button
                 onClick={() => {
                   onClose();

@@ -1,6 +1,5 @@
 import React from 'react';
-import { motion } from 'motion/react';
-import { ArrowRight, Download, ShieldCheck, Wallet } from 'lucide-react';
+import { ArrowRight, Download, ShieldCheck } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 interface CTAProps {

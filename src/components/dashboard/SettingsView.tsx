@@ -20,9 +20,11 @@ import {
   LANGUAGE_OPTIONS,
   AppLanguage,
 } from '../../context/AppSettingsContext';
+import { useWallet } from '../../context/WalletContext';
 
 export const SettingsView: React.FC = () => {
   const { showToast } = useToast();
+  const { isWalletConnected, walletProvider, openConnectModal, disconnectWallet } = useWallet();
   const {
     language,
     setLanguage,
@@ -149,30 +151,58 @@ export const SettingsView: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-white">{walletData.name}</span>
-                  <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    {walletData.status}
+                  <span className="text-sm font-bold text-white">
+                    {isWalletConnected ? (walletProvider || walletData.name) : 'No Wallet Connected'}
+                  </span>
+                  <span className={`text-[11px] font-mono flex items-center gap-1 ${
+                    isWalletConnected ? 'text-emerald-400' : 'text-neutral-500'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      isWalletConnected ? 'bg-emerald-400' : 'bg-neutral-600'
+                    }`} />
+                    {isWalletConnected ? walletData.status : 'Disconnected'}
                   </span>
                 </div>
-                <div className="text-xs text-neutral-400 font-mono mt-0.5">{walletData.type}</div>
-                <div className="flex items-center gap-2 mt-2 font-mono text-xs text-neutral-300">
-                  <span className="truncate max-w-[220px] sm:max-w-sm">{walletData.address}</span>
-                  <button
-                    onClick={() => handleCopy(walletData.address, 'wallet')}
-                    className="text-neutral-400 hover:text-white transition-colors cursor-pointer p-1 rounded-md hover:bg-white/[0.06]"
-                    title={t.copyAddress}
-                    aria-label={t.copyAddress}
-                  >
-                    {copiedKey === 'wallet' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
+                <div className="text-xs text-neutral-400 font-mono mt-0.5">
+                  {isWalletConnected ? walletData.type : 'Connect your Web3 wallet to access Hybit'}
                 </div>
+                {isWalletConnected ? (
+                  <div className="flex items-center gap-2 mt-2 font-mono text-xs text-neutral-300">
+                    <span className="truncate max-w-[220px] sm:max-w-sm">{walletData.address}</span>
+                    <button
+                      onClick={() => handleCopy(walletData.address, 'wallet')}
+                      className="text-neutral-400 hover:text-white transition-colors cursor-pointer p-1 rounded-md hover:bg-white/[0.06]"
+                      title={t.copyAddress}
+                      aria-label={t.copyAddress}
+                    >
+                      {copiedKey === 'wallet' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      onClick={disconnectWallet}
+                      className="text-neutral-400 hover:text-red-400 transition-colors ml-2 px-2 py-0.5 rounded-md hover:bg-white/[0.06] cursor-pointer text-[10px] font-mono border border-white/10"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2.5">
+                    <button
+                      onClick={openConnectModal}
+                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0095FF] hover:bg-[#0080E0] text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
+                    >
+                      <Wallet className="w-3.5 h-3.5" />
+                      <span>Connect Wallet</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="sm:text-right font-mono">
               <div className="text-xs text-neutral-400">{language === 'id' ? 'Total Valuasi' : 'Total Valuation'} ({currentCurrency.code})</div>
-              <div className="text-lg font-bold text-white tracking-tight">{formatCurrency(walletData.rawBalanceUsd)}</div>
+              <div className="text-lg font-bold text-white tracking-tight">
+                {isWalletConnected ? formatCurrency(walletData.rawBalanceUsd) : formatCurrency(0)}
+              </div>
             </div>
           </div>
 

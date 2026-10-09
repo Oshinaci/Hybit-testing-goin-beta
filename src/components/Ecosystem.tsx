@@ -11,7 +11,7 @@ import {
   SuiIcon,
   AptosIcon,
 } from './icons/NetworkIcons';
-import { Globe2, Zap, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { Globe2 } from 'lucide-react';
 import { SupportedNetwork } from '../types';
 
 export const Ecosystem: React.FC = () => {

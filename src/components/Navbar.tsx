@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, ArrowRight, Wallet } from 'lucide-react';
 import { HybitLogo } from './icons/NetworkIcons';
 import { MobileDrawer } from './MobileDrawer';
 import { useToast } from '../context/ToastContext';
+import { useWallet } from '../context/WalletContext';
 
 interface NavbarProps {
   onLaunchApp: () => void;
@@ -10,9 +11,9 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onLaunchApp, onDownload }) => {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { showComingSoon } = useToast();
+  const { isWalletConnected, openConnectModal } = useWallet();
 
   const handleDownloadClick = () => {
     if (onDownload) {
@@ -21,18 +22,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onLaunchApp, onDownload }) => {
       showComingSoon('Hybit Mobile App');
     }
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -82,7 +71,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onLaunchApp, onDownload }) => {
             </nav>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              {!isWalletConnected ? (
+                <button
+                  onClick={openConnectModal}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold text-neutral-200 hover:text-white bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <Wallet className="w-3.5 h-3.5 text-[#0095FF]" />
+                  <span>Connect Wallet</span>
+                </button>
+              ) : (
+                <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono text-neutral-300 bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span>0x7F2...8b1e</span>
+                </div>
+              )}
+
               <button
                 onClick={onLaunchApp}
                 className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide text-white bg-[#0095FF] hover:bg-[#0080E0] shadow-sm active:scale-[0.98] transition-colors duration-150 cursor-pointer"

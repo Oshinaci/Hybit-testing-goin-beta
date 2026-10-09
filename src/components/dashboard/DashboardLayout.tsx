@@ -11,12 +11,14 @@ import {
   Check,
   ChevronDown,
   Repeat,
+  Wallet,
 } from 'lucide-react';
 import { DashboardPage, NetworkOption, NotificationItem } from '../../types/dashboard';
 import { EthereumIcon, BaseIcon, SolanaIcon, ArbitrumIcon, PolygonIcon, OptimismIcon } from '../icons/NetworkIcons';
 import { useAppSettings } from '../../context/AppSettingsContext';
 import { useToast } from '../../context/ToastContext';
 import { usePullToRefresh } from '../../context/PullToRefreshContext';
+import { useWallet } from '../../context/WalletContext';
 
 interface DashboardLayoutProps {
   currentPage: DashboardPage;
@@ -36,6 +38,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { t, language } = useAppSettings();
   const { showToast } = useToast();
   const { cancelRefresh } = usePullToRefresh();
+  const { isWalletConnected, walletAddress, openConnectModal } = useWallet();
   const [copied, setCopied] = useState(false);
   const [selectedNetwork, setSelectedNetwork] = useState('base');
   const [networkDropdownOpen, setNetworkDropdownOpen] = useState(false);
@@ -57,8 +60,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const walletAddress = '0x7F2a45B083C29E41c7F3bDa208B49a37e89e8b1e';
 
   const networks: NetworkOption[] = [
     { id: 'base', name: 'Base L2', symbol: 'ETH', iconColor: 'text-[#0095FF]', badge: language === 'id' ? 'Tercepat' : 'Fastest' },
@@ -135,21 +136,31 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <header className="sticky top-0 z-40 bg-transparent px-4 sm:px-6 pt-4 pb-2">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           
-          {/* Left: Wallet Address Card */}
-          <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-[#141419] border border-white/10 shadow-lg shadow-black/40 hover:border-white/20 transition-all">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
-            <span className="text-xs font-mono font-medium text-neutral-200">
-              0x7F2...8b1e
-            </span>
+          {/* Left: Wallet Address Card / Connect Wallet Button */}
+          {!isWalletConnected ? (
             <button
-              onClick={handleCopy}
-              className="text-neutral-400 hover:text-white transition-colors ml-0.5 p-1 rounded-lg hover:bg-white/[0.06] cursor-pointer"
-              title={t.copyAddress}
-              aria-label={t.copyAddress}
+              onClick={openConnectModal}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#0095FF] hover:bg-[#0080E0] text-white text-xs font-semibold shadow-lg shadow-[#0095FF]/20 active:scale-[0.98] transition-all cursor-pointer"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <Wallet className="w-3.5 h-3.5" />
+              <span>Connect Wallet</span>
             </button>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#141419] border border-white/10 hover:border-white/20 text-neutral-200 hover:text-white shadow-md shadow-black/40 text-xs font-medium transition-colors select-none">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+              <span className="font-mono font-medium text-neutral-200">
+                {walletAddress ? `${walletAddress.slice(0, 5)}...${walletAddress.slice(-4)}` : '0x7F2...8b1e'}
+              </span>
+              <button
+                onClick={handleCopy}
+                className="text-neutral-400 hover:text-white transition-colors p-0.5 rounded hover:bg-white/[0.08] cursor-pointer"
+                title={t.copyAddress}
+                aria-label={t.copyAddress}
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          )}
 
           {/* Right: Network Selector Card + Notification Bell Card */}
           <div className="flex items-center gap-2 sm:gap-3">

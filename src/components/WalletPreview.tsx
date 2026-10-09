@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import {
   TrendingUp,
   ArrowUpRight,
-  ArrowDownLeft,
   Repeat,
   ShieldCheck,
   CheckCircle2,
-  ChevronDown,
-  Layers,
-  ExternalLink,
 } from 'lucide-react';
 import { EthereumIcon, SolanaIcon, BaseIcon, CircleIcon } from './icons/NetworkIcons';
 import { useToast } from '../context/ToastContext';
@@ -17,12 +12,9 @@ import { useToast } from '../context/ToastContext';
 export const WalletPreview: React.FC<{ onLaunchApp?: () => void }> = ({ onLaunchApp }) => {
   const { showToast } = useToast();
   const [timeframe, setTimeframe] = useState<'1D' | '1W' | '1M' | '1Y' | 'ALL'>('1M');
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'swap'>('portfolio');
 
   // Interactive Swap Simulator state
   const [swapFromAmount, setSwapFromAmount] = useState('1.5');
-  const [swapTokenFrom, setSwapTokenFrom] = useState('ETH');
-  const [swapTokenTo, setSwapTokenTo] = useState('USDC');
   const [isSwapping, setIsSwapping] = useState(false);
   const [swapSuccess, setSwapSuccess] = useState(false);
 
