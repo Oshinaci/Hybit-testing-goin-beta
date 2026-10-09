@@ -482,6 +482,10 @@ export const AppSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return 'USD';
   });
 
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
   const setLanguage = useCallback((lang: AppLanguage) => {
     setLanguageState(lang);
     try {

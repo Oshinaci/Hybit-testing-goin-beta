@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Wallet, ShieldCheck, Check, Mail, ArrowRight } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
+import { useLandingTranslation } from '../translations/landingTranslations';
 
 interface ConnectWalletModalProps {
   isOpen: boolean;
@@ -16,47 +17,36 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
 }) => {
   const { connectWallet, isWalletConnected, walletProvider } = useWallet();
   const [connectingId, setConnectingId] = useState<string | null>(null);
+  const t = useLandingTranslation();
 
   if (!isOpen) return null;
 
-  const walletOptions = [
-    {
-      id: 'privy',
-      name: 'Privy Embedded Wallet',
-      description: 'Email & Passkey 1-Click login (Recommended)',
-      badge: 'Fast & Secure',
-      iconBg: 'bg-[#0095FF]/20 text-[#0095FF]',
-      recommended: true,
-    },
-    {
-      id: 'metamask',
-      name: 'MetaMask',
-      description: 'Connect via browser extension or mobile app',
-      badge: 'EVM',
-      iconBg: 'bg-amber-500/20 text-amber-400',
-    },
-    {
-      id: 'coinbase',
-      name: 'Coinbase Smart Wallet',
-      description: 'Zero gas passes & passkey verification',
-      badge: 'Passkey',
-      iconBg: 'bg-blue-600/20 text-blue-400',
-    },
-    {
-      id: 'phantom',
-      name: 'Phantom',
-      description: 'Solana & Ethereum multi-chain wallet',
-      badge: 'Multi-Chain',
-      iconBg: 'bg-purple-500/20 text-purple-400',
-    },
-    {
-      id: 'walletconnect',
-      name: 'WalletConnect',
-      description: 'Scan QR code with 300+ crypto wallets',
-      badge: 'Universal',
-      iconBg: 'bg-cyan-500/20 text-cyan-400',
-    },
-  ];
+  const getProviderIcon = (id: string) => {
+    switch (id) {
+      case 'privy':
+        return <Mail className="w-5 h-5" />;
+      case 'coinbase':
+        return <ShieldCheck className="w-5 h-5" />;
+      default:
+        return <Wallet className="w-5 h-5" />;
+    }
+  };
+
+  const getProviderIconBg = (id: string) => {
+    switch (id) {
+      case 'privy':
+        return 'bg-[#0095FF]/20 text-[#0095FF]';
+      case 'metamask':
+        return 'bg-amber-500/20 text-amber-400';
+      case 'coinbase':
+        return 'bg-blue-600/20 text-blue-400';
+      case 'phantom':
+        return 'bg-purple-500/20 text-purple-400';
+      case 'walletconnect':
+      default:
+        return 'bg-cyan-500/20 text-cyan-400';
+    }
+  };
 
   const handleSelectProvider = (name: string, id: string) => {
     setConnectingId(id);
@@ -96,8 +86,8 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
                 <Wallet className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white tracking-tight">Connect Wallet</h3>
-                <p className="text-[11px] text-neutral-400 font-mono">1 Email : 1 Self-Custody Wallet</p>
+                <h3 className="text-base font-bold text-white tracking-tight">{t.connectModal.title}</h3>
+                <p className="text-[11px] text-neutral-400 font-mono">{t.connectModal.subtitle}</p>
               </div>
             </div>
             <button
@@ -111,9 +101,10 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
 
           {/* Wallet List */}
           <div className="mt-4 space-y-2">
-            {walletOptions.map((opt) => {
+            {t.connectModal.options.map((opt) => {
               const isSelected = isWalletConnected && walletProvider === opt.name;
               const isConnecting = connectingId === opt.id;
+              const iconBg = getProviderIconBg(opt.id);
 
               return (
                 <button
@@ -127,21 +118,15 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${opt.iconBg}`}>
-                      {opt.id === 'privy' ? (
-                        <Mail className="w-5 h-5" />
-                      ) : opt.id === 'coinbase' ? (
-                        <ShieldCheck className="w-5 h-5" />
-                      ) : (
-                        <Wallet className="w-5 h-5" />
-                      )}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
+                      {getProviderIcon(opt.id)}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-xs sm:text-sm font-semibold truncate">{opt.name}</span>
                         {opt.recommended && (
                           <span className="px-1.5 py-0.5 rounded-md bg-[#0095FF]/20 text-[#0095FF] text-[9px] font-semibold tracking-wide">
-                            RECOMMENDED
+                            {t.connectModal.recommendedBadge}
                           </span>
                         )}
                       </div>
@@ -155,7 +140,7 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
                     ) : isSelected ? (
                       <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400">
                         <Check className="w-3.5 h-3.5" />
-                        Connected
+                        {t.connectModal.connectedBadge}
                       </span>
                     ) : (
                       <ArrowRight className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300" />
@@ -170,7 +155,7 @@ export const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({
           <div className="mt-5 pt-3.5 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-neutral-400 font-mono">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              Non-custodial MPC Encryption
+              {t.connectModal.footerNotice}
             </span>
             <span className="text-neutral-500">v1.0.0</span>
           </div>

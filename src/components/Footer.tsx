@@ -1,41 +1,28 @@
 import React from 'react';
 import { HybitLogo } from './icons/NetworkIcons';
 import { useToast } from '../context/ToastContext';
+import { useLandingTranslation } from '../translations/landingTranslations';
 
 export const Footer: React.FC<{ onDownload?: () => void }> = ({ onDownload }) => {
   const { showToast, showComingSoon } = useToast();
+  const t = useLandingTranslation();
 
   const handleLinkClick = (e: React.MouseEvent, label: string) => {
     e.preventDefault();
-    if (label.toLowerCase().includes('download') || label.toLowerCase().includes('app')) {
+    if (
+      label.toLowerCase().includes('unduh') ||
+      label.toLowerCase().includes('aplikasi') ||
+      label.toLowerCase().includes('download') ||
+      label.toLowerCase().includes('app')
+    ) {
       if (onDownload) {
         onDownload();
       } else {
         showComingSoon('Hybit Mobile App');
       }
     } else {
-      showToast(`${label} Portal`, 'Opening documentation & security portal resources', 'info');
+      showToast(label, t.footer.noticePlaceholder, 'info');
     }
-  };
-  const links = {
-    company: [
-      { label: 'About Us', href: '#' },
-      { label: 'Careers', href: '#' },
-      { label: 'Brand Assets', href: '#' },
-      { label: 'Security & Audits', href: '#security' },
-    ],
-    resources: [
-      { label: 'Documentation', href: '#' },
-      { label: 'Ecosystem', href: '#ecosystem' },
-      { label: 'Developers API', href: '#' },
-      { label: 'Status Page', href: '#' },
-    ],
-    legal: [
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Terms of Service', href: '#' },
-      { label: 'Bug Bounty', href: '#' },
-      { label: 'Responsible Disclosure', href: '#' },
-    ],
   };
 
   return (
@@ -46,32 +33,31 @@ export const Footer: React.FC<{ onDownload?: () => void }> = ({ onDownload }) =>
           
           {/* Brand Col */}
           <div className="lg:col-span-2">
-            <a href="#" className="inline-block mb-4">
+            <a href="#" className="inline-block mb-4" aria-label="Hybit">
               <HybitLogo size={36} showText={true} />
             </a>
             
             <p className="text-sm text-neutral-400 max-w-sm leading-relaxed mb-6">
-              <span className="font-chinese text-base sm:text-lg text-white">Hybit</span> is the everyday crypto wallet where anyone can safely store, send, receive, swap, and manage digital assets with GoPay-level simplicity.
+              {t.footer.description}
             </p>
 
-            {/* System Status Indicator - Clean unboxed text */}
+            {/* Version Information */}
             <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>All Systems Operational</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0095FF]" />
+              <span>{t.footer.version}</span>
             </div>
           </div>
 
-          {/* Company */}
+          {/* Product */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
-              Company
+              {t.footer.productHeading}
             </h4>
             <ul className="space-y-2.5">
-              {links.company.map((l) => (
+              {t.footer.links.product.map((l) => (
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    onClick={(e) => handleLinkClick(e, l.label)}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
                     {l.label}
@@ -81,17 +67,20 @@ export const Footer: React.FC<{ onDownload?: () => void }> = ({ onDownload }) =>
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Guides / Resources */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
-              Resources
+              {t.footer.guidesHeading}
             </h4>
             <ul className="space-y-2.5">
-              {links.resources.map((l) => (
+              {t.footer.links.guides.map((l) => (
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    onClick={(e) => handleLinkClick(e, l.label)}
+                    onClick={(e) => {
+                      if (l.href === '#faq') return;
+                      handleLinkClick(e, l.label);
+                    }}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
                     {l.label}
@@ -104,14 +93,17 @@ export const Footer: React.FC<{ onDownload?: () => void }> = ({ onDownload }) =>
           {/* Legal */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
-              Legal & Trust
+              {t.footer.legalHeading}
             </h4>
             <ul className="space-y-2.5">
-              {links.legal.map((l) => (
+              {t.footer.links.legal.map((l) => (
                 <li key={l.label}>
                   <a
                     href={l.href}
-                    onClick={(e) => handleLinkClick(e, l.label)}
+                    onClick={(e) => {
+                      if (l.href === '#security') return;
+                      handleLinkClick(e, l.label);
+                    }}
                     className="hover:text-white transition-colors cursor-pointer"
                   >
                     {l.label}
@@ -126,7 +118,7 @@ export const Footer: React.FC<{ onDownload?: () => void }> = ({ onDownload }) =>
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <div>
-            © {new Date().getFullYear()} <span className="font-chinese text-sm sm:text-base text-neutral-200">Hybit</span> Labs, Inc. All rights reserved. Crypto as Easy as GoPay.
+            {t.footer.copyright}
           </div>
 
           <div className="flex items-center gap-6">

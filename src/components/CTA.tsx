@@ -1,6 +1,8 @@
 import React from 'react';
-import { ArrowRight, Download, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Download, ShieldCheck, Mail, Zap } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { useAppSettings } from '../context/AppSettingsContext';
+import { useLandingTranslation } from '../translations/landingTranslations';
 
 interface CTAProps {
   onLaunchApp: () => void;
@@ -9,12 +11,14 @@ interface CTAProps {
 
 export const CTA: React.FC<CTAProps> = ({ onLaunchApp, onDownload }) => {
   const { showComingSoon } = useToast();
+  const { language } = useAppSettings();
+  const t = useLandingTranslation();
 
   const handleDownloadClick = () => {
     if (onDownload) {
       onDownload();
     } else {
-      showComingSoon('Hybit Mobile App (iOS & Android)');
+      showComingSoon(language === 'id' ? 'Aplikasi Mobile Hybit' : 'Hybit Mobile App');
     }
   };
 
@@ -29,17 +33,17 @@ export const CTA: React.FC<CTAProps> = ({ onLaunchApp, onDownload }) => {
             
             {/* Clean Unboxed Kicker */}
             <div className="flex items-center justify-center gap-2 text-xs font-medium text-neutral-400 mb-6 tracking-wide">
-              <span className="text-neutral-200">Early Access v1.0.0</span>
+              <span className="text-neutral-200">1 Email, 1 Wallet</span>
               <span className="text-neutral-600">·</span>
-              <span>Non-Custodial</span>
+              <span>Hybit ID</span>
             </div>
 
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight text-balance">
-              Start Your Crypto Journey Today.
+              {t.cta.title}
             </h2>
 
             <p className="mt-6 text-base sm:text-xl text-neutral-300 leading-relaxed max-w-xl mx-auto text-balance">
-              Experience the everyday wallet built for everyone. No complicated seeds, no confusing bridges. Just instant, safe crypto.
+              {t.cta.subtitle}
             </p>
 
             {/* Action Buttons */}
@@ -48,7 +52,7 @@ export const CTA: React.FC<CTAProps> = ({ onLaunchApp, onDownload }) => {
                 onClick={onLaunchApp}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-[#0095FF] hover:bg-[#0080E0] text-white text-base font-semibold shadow-lg shadow-black/30 active:scale-[0.98] transition-all cursor-pointer group"
               >
-                <span>Launch App</span>
+                <span>{t.cta.openHybit}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
@@ -57,23 +61,29 @@ export const CTA: React.FC<CTAProps> = ({ onLaunchApp, onDownload }) => {
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white/[0.07] hover:bg-white/[0.12] border border-white/10 text-white text-base font-medium active:scale-[0.98] transition-all cursor-pointer"
               >
                 <Download className="w-4 h-4 text-neutral-400" />
-                <span>Download App</span>
+                <span>{t.cta.downloadApp}</span>
                 <span className="text-xs font-mono text-neutral-400 ml-1">
-                  · Coming Soon
+                  {t.cta.comingSoon}
                 </span>
               </button>
             </div>
 
-            {/* Micro guarantees */}
+            {/* Micro details */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-neutral-400 font-medium">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                100% Non-Custodial
+                <Mail className="w-4 h-4 text-[#0095FF]" />
+                {t.cta.guarantee1}
               </span>
               <span className="text-neutral-600">·</span>
-              <span>Available on iOS, Android & Web</span>
+              <span className="flex items-center gap-1.5">
+                <Zap className="w-4 h-4 text-amber-400" />
+                {t.cta.guarantee2}
+              </span>
               <span className="text-neutral-600">·</span>
-              <span>Set Up in 5 Seconds</span>
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                {t.cta.guarantee3}
+              </span>
             </div>
 
           </div>

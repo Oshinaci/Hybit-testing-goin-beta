@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ArrowRight, Download, Wallet } from 'lucide-react';
+import { X, ArrowRight, Download, Wallet, Globe } from 'lucide-react';
 import { HybitLogo } from './icons/NetworkIcons';
 import { useToast } from '../context/ToastContext';
 import { useWallet } from '../context/WalletContext';
+import { useAppSettings } from '../context/AppSettingsContext';
+import { useLandingTranslation } from '../translations/landingTranslations';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -20,16 +22,18 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 }) => {
   const { showComingSoon } = useToast();
   const { isWalletConnected, openConnectModal, disconnectWallet } = useWallet();
+  const { language, setLanguage } = useAppSettings();
+  const t = useLandingTranslation();
 
   const handleDownloadClick = () => {
     onClose();
     if (onDownload) {
       onDownload();
     } else {
-      showComingSoon('Hybit Mobile App');
+      showComingSoon(language === 'id' ? 'Aplikasi Mobile Hybit' : 'Hybit Mobile App');
     }
   };
-  // Lock body scroll when drawer is open
+
   useEffect(() => {
     if (isOpen) {
       const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -41,11 +45,11 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   }, [isOpen]);
 
   const navLinks = [
-    { label: 'Features', href: '#features' },
-    { label: 'Wallet Preview', href: '#preview' },
-    { label: 'Security', href: '#security' },
-    { label: 'Ecosystem', href: '#ecosystem' },
-    { label: 'FAQ', href: '#faq' },
+    { label: t.navbar.features, href: '#features' },
+    { label: t.navbar.preview, href: '#preview' },
+    { label: t.navbar.security, href: '#security' },
+    { label: t.navbar.networks, href: '#ecosystem' },
+    { label: t.navbar.faq, href: '#faq' },
   ];
 
   const handleLinkClick = (href: string) => {
@@ -71,7 +75,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             aria-hidden="true"
           />
 
-          {/* Drawer: slides from left, #09090B, 95% opacity, backdrop blur, soft border, premium shadow */}
+          {/* Drawer */}
           <motion.div
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
@@ -95,7 +99,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             {/* Navigation links */}
             <nav className="flex flex-col gap-1 py-6 flex-1">
               <span className="text-xs font-medium uppercase tracking-wider text-neutral-500 mb-2 px-3">
-                Navigation
+                {t.drawer.navigationHeading}
               </span>
               {navLinks.map((item) => (
                 <button
@@ -108,17 +112,31 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 </button>
               ))}
 
-              <div className="pt-4 mt-2 border-t border-white/[0.06]">
+              <div className="pt-4 mt-2 border-t border-white/[0.06] space-y-2">
                 <button
                   onClick={handleDownloadClick}
                   className="flex items-center justify-between w-full px-3 py-3 rounded-xl text-base font-medium text-neutral-300 hover:text-white hover:bg-white/[0.05] transition-all text-left"
                 >
                   <span className="flex items-center gap-2.5">
                     <Download className="w-4 h-4 text-[#0095FF]" />
-                    Download App
+                    {t.drawer.appMobile}
                   </span>
                   <span className="text-[10px] font-mono text-neutral-400">
-                    · Coming Soon
+                    {t.drawer.comingSoon}
+                  </span>
+                </button>
+
+                {/* Mobile Language Switcher */}
+                <button
+                  onClick={() => setLanguage(language === 'id' ? 'en' : 'id')}
+                  className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/[0.05] transition-all text-left border border-white/5"
+                >
+                  <span className="flex items-center gap-2 text-neutral-300">
+                    <Globe className="w-4 h-4 text-[#0095FF]" />
+                    <span>Language / Bahasa</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/10 text-xs font-mono uppercase text-white font-semibold">
+                    {language}
                   </span>
                 </button>
               </div>
@@ -135,13 +153,13 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-white font-medium text-sm transition-all cursor-pointer"
                 >
                   <Wallet className="w-4 h-4 text-[#0095FF]" />
-                  <span>Connect Wallet</span>
+                  <span>{t.drawer.connectWallet}</span>
                 </button>
               ) : (
                 <div className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="font-mono text-neutral-300">0x7F2...8b1e</span>
+                    <span className="font-mono text-neutral-300">alex.hybit</span>
                   </div>
                   <button
                     onClick={() => {
@@ -150,7 +168,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     }}
                     className="text-neutral-400 hover:text-red-400 text-[11px] font-mono cursor-pointer"
                   >
-                    Disconnect
+                    {t.drawer.disconnect}
                   </button>
                 </div>
               )}
@@ -162,15 +180,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 }}
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#0095FF] hover:bg-[#0080E0] text-white font-medium text-sm shadow-sm active:scale-[0.98] transition-all cursor-pointer"
               >
-                Launch App
+                {t.drawer.openHybit}
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <div className="flex items-center justify-between text-xs text-neutral-500 pt-2 px-1">
-                <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                  Mainnet Ready
+                <span className="flex items-center gap-1.5 text-neutral-400 font-medium">
+                  {t.drawer.note1}
                 </span>
-                <span className="font-mono text-neutral-400">Early Access v1.0.0</span>
+                <span className="font-mono text-neutral-400">{t.drawer.note2}</span>
               </div>
             </div>
           </motion.div>

@@ -14,22 +14,25 @@ import {
   LayerZeroIcon,
   ChainlinkIcon,
 } from './icons/NetworkIcons';
+import { useLandingTranslation } from '../translations/landingTranslations';
 
 export const TrustedBy: React.FC = () => {
+  const t = useLandingTranslation();
+
   const partners = [
-    { name: 'Ethereum', icon: EthereumIcon, role: 'L1 Base Layer' },
-    { name: 'Base', icon: BaseIcon, role: 'Optimistic L2' },
-    { name: 'Solana', icon: SolanaIcon, role: 'High-Speed L1' },
-    { name: 'Polygon', icon: PolygonIcon, role: 'PoS & zkEVM' },
-    { name: 'Arbitrum', icon: ArbitrumIcon, role: 'L2 Scaling' },
-    { name: 'Optimism', icon: OptimismIcon, role: 'OP Stack' },
-    { name: 'BNB Chain', icon: BNBIcon, role: 'DeFi Ecosystem' },
-    { name: 'Sui', icon: SuiIcon, role: 'Move Architecture' },
-    { name: 'Aptos', icon: AptosIcon, role: 'Parallel Execution' },
-    { name: 'LayerZero', icon: LayerZeroIcon, role: 'Omnichain Messaging' },
-    { name: 'Circle', icon: CircleIcon, role: 'Native USDC' },
-    { name: 'Chainlink', icon: ChainlinkIcon, role: 'Price Oracles' },
-    { name: 'WalletConnect', icon: WalletConnectIcon, role: 'Universal Link' },
+    { name: 'Ethereum', icon: EthereumIcon, role: t.trustedBy.roles.layer1 },
+    { name: 'Base', icon: BaseIcon, role: t.trustedBy.roles.layer2 },
+    { name: 'Solana', icon: SolanaIcon, role: t.trustedBy.roles.layer1 },
+    { name: 'Polygon', icon: PolygonIcon, role: t.trustedBy.roles.layer2 },
+    { name: 'Arbitrum', icon: ArbitrumIcon, role: t.trustedBy.roles.layer2 },
+    { name: 'Optimism', icon: OptimismIcon, role: t.trustedBy.roles.layer2 },
+    { name: 'BNB Chain', icon: BNBIcon, role: t.trustedBy.roles.evmChain },
+    { name: 'Sui', icon: SuiIcon, role: t.trustedBy.roles.layer1 },
+    { name: 'Aptos', icon: AptosIcon, role: t.trustedBy.roles.layer1 },
+    { name: 'LayerZero', icon: LayerZeroIcon, role: t.trustedBy.roles.bridgeProtocol },
+    { name: 'Circle', icon: CircleIcon, role: t.trustedBy.roles.usdcIssuer },
+    { name: 'Chainlink', icon: ChainlinkIcon, role: t.trustedBy.roles.dataOracle },
+    { name: 'WalletConnect', icon: WalletConnectIcon, role: t.trustedBy.roles.connectionProtocol },
   ];
 
   return (
@@ -38,7 +41,7 @@ export const TrustedBy: React.FC = () => {
         
         <div className="text-center mb-8">
           <p className="text-xs uppercase tracking-widest text-neutral-400 font-semibold">
-            Secured by & Integrated with Industry-Leading Protocols
+            {t.trustedBy.sectionTitle}
           </p>
         </div>
 

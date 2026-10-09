@@ -10,60 +10,26 @@ import {
   CheckCircle2,
   ExternalLink,
 } from 'lucide-react';
+import { useLandingTranslation } from '../translations/landingTranslations';
 
 export const Security: React.FC = () => {
-  const securityPillars = [
-    {
-      id: 'non-custodial',
-      title: 'Non-Custodial',
-      subtitle: 'True Sovereign Ownership',
-      description:
-        'You maintain 100% mathematical ownership over your assets at all times. Hybit never holds your private keys, cannot freeze your funds, and cannot access your assets.',
-      icon: KeyRound,
-      badge: 'Zero Counterparty Risk',
-      points: ['Cryptographic self-custody', 'Client-side signing only', 'EIP-4337 smart account native'],
-    },
-    {
-      id: 'open-source',
-      title: 'Open Source',
-      subtitle: 'Verifiable Transparency',
-      description:
-        'Every line of our client-side software is publicly auditable on GitHub. We believe trust in financial infrastructure must be verifiable by the developer community.',
-      icon: Code2,
-      badge: 'Public GitHub Repos',
-      points: ['Reproducible builds', 'Public bug bounty program ($500K)', 'Zero proprietary black boxes'],
-    },
-    {
-      id: 'audited-contracts',
-      title: 'Audited Smart Contracts',
-      subtitle: 'Formally Verified',
-      description:
-        'All Hybit smart account modules, bridge relayers, and swap routers undergo formal mathematical verification and exhaustive penetration testing.',
-      icon: FileCheck2,
-      badge: 'Triple Audited',
-      points: ['Audited by OpenZeppelin', 'Trail of Bits security review', 'Halborn pen-test certified'],
-    },
-    {
-      id: 'mpc-ready',
-      title: 'MPC Ready',
-      subtitle: 'Multi-Party Computation',
-      description:
-        'Cryptographic keys are split into threshold shares (2-of-3) distributed across your secure device enclave, encrypted cloud, and an independent recovery node.',
-      icon: Cpu,
-      badge: 'Threshold Cryptography',
-      points: ['No single point of failure', 'Loss prevention guarantee', 'Sub-second signature assembly'],
-    },
-    {
-      id: 'encrypted-recovery',
-      title: 'Encrypted Recovery',
-      subtitle: 'AES-256-GCM Zero-Knowledge',
-      description:
-        'Backup your encrypted vault to iCloud Keychain or Google Drive with end-to-end zero-knowledge encryption. Accessible only via your biometric Passkey.',
-      icon: Lock,
-      badge: 'Biometric Enclave',
-      points: ['Apple Secure Enclave backing', 'Android Titan M2 chip support', 'WebAuthn hardware tokens'],
-    },
-  ];
+  const t = useLandingTranslation();
+
+  const getPillarIcon = (id: string) => {
+    switch (id) {
+      case 'user-control':
+        return KeyRound;
+      case 'passkey-login':
+        return Lock;
+      case 'encrypted-infrastructure':
+        return Cpu;
+      case 'account-recovery':
+        return FileCheck2;
+      case 'data-privacy':
+      default:
+        return Code2;
+    }
+  };
 
   return (
     <section id="security" className="py-24 sm:py-32 relative bg-[#09090B] border-t border-white/[0.06]">
@@ -72,23 +38,22 @@ export const Security: React.FC = () => {
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-3">
-            Institutional Security Architecture
+            {t.security.kicker}
           </p>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
-            Fortress Security. Zero Compromises.
+            {t.security.title}
           </h2>
 
           <p className="mt-4 text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-            <span className="font-chinese text-white">Hybit</span> combines mathematical self-custody with modern consumer protection so you never have to worry about losing access to your funds.
+            {t.security.subtitle}
           </p>
         </div>
 
         {/* Security Cards Grid: Asymmetric Bento style */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {securityPillars.map((pillar, idx) => {
-            const Icon = pillar.icon;
-            // First card spans 2 columns on larger screens for visual asymmetry
+          {t.security.pillars.map((pillar, idx) => {
+            const Icon = getPillarIcon(pillar.id);
             const isWide = idx === 0;
 
             return (
@@ -138,13 +103,13 @@ export const Security: React.FC = () => {
           })}
         </div>
 
-        {/* Security Audit Badges / Partners Bar */}
+        {/* Security Bar */}
         <div className="mt-12 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0" />
             <div>
-              <div className="text-sm font-semibold text-white">Continuous Penetration Testing & Audits</div>
-              <div className="text-xs text-neutral-400">Public reports available for OpenZeppelin, Trail of Bits, and Halborn</div>
+              <div className="text-sm font-semibold text-white">{t.security.bottomTitle}</div>
+              <div className="text-xs text-neutral-400">{t.security.bottomSubtitle}</div>
             </div>
           </div>
 
@@ -152,7 +117,7 @@ export const Security: React.FC = () => {
             href="#faq"
             className="text-xs font-semibold text-[#0095FF] hover:text-white flex items-center gap-1.5 transition-colors"
           >
-            <span>Read Security Specifications</span>
+            <span>{t.security.bottomLink}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
