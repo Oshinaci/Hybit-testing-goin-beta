@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --font-chinese: 'Lobster', cursive;
+  --font-lobster: 'Lobster', cursive;
+  --color-primary: #0095FF;
+  --color-secondary: #0058FF;
+  --color-accent: #0095FF;
+  --color-background: #09090B;
+  --color-surface: #18181B;
+  --color-surface-muted: #121215;
+  --color-surface-hover: #222226;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-success: #16C784;
+  --color-danger: #EA3943;
+}
+
+.font-chinese,
+.font-lobster,
+.font-brand {
+  font-family: 'Lobster', cursive, sans-serif !important;
+}
+
+@layer base {
+  *, ::before, ::after {
+    border-color: rgba(255, 255, 255, 0.08);
+    -webkit-tap-highlight-color: transparent;
+  }
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
+  }
+  body {
+    background-color: #09090B;
+    color: #FAFAFA;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Hide scrollbars across all browsers and components while keeping full scrolling functionality */
+html,
+body,
+* {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+*::-webkit-scrollbar,
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+/* Explicit utility class for components requiring no-scrollbar */
+.no-scrollbar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Smooth slow rotation for Hybit logo pull-to-refresh */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 1.8s linear infinite;
+}
